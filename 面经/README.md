@@ -15,6 +15,34 @@ var n_myint MyInt = n.(MyInt)
 
 <br>
 
+### uintptr 和 unsafe.Pointer的区别？
+* unsafe.Pointer 将一个具体类型的指针转换为通用指针；
+  > 通用指针可以显示转换为具体类型的指针;  
+  > 通用指针无法进行加减运算；
+  ```go
+  var m int = 32
+  var p = unsafe.Pointer(&m)
+  var n = (*int)(p)
+  ```
+* uintptr用于通用指针的运算；
+  ```go
+  var m int = 32
+  var p = unsafe.Pointer(&m)
+  var n = unsafe.Pointer((uintptr(p) + 1))
+  var c = (*byte)(n)
+  ```
+
+<br>
+
+
+### 值传递 和 指针传递的区别
+* 值传递情况下，原数据的值不会被修改
+* 指针传递情况下，原数据的值会被影响
+* go只有值传递，函数参数如果是指针类型，也是指针的值副本
+  > 由于指针和指针的副本，指向的是相同的内存区域，因此指针类型的参数会影响到原数据
+
+<br>
+
 ### 下面的切片声明是否正确？
 ```go
 
@@ -75,7 +103,10 @@ m := []int {             // ✅
 > 1. init函数也要无输入参数，无返回值；  
 > 2. init函数不能被显示调用；   
 > 3. 一个package中，init函数可以有多个；  
-> 4. 先初始化导入包的变量和常量，再执行init函数，之后初始化本包的变量和常量，再执行init函数，最后执行main函数。
+> 4. 一个.go文件中，init函数可以有多个；
+> 5. 先初始化导入包的变量和常量，再执行init函数，
+之后初始化本包的变量和常量，再执行init函数，最后执行main函数。
+> 6. 不管包被导入多少次，包内的init函数只会执行一次。
 
 <br>
 
@@ -112,8 +143,75 @@ m := []int {             // ✅
 <br>
 
 ### const 常量对数据类型有什么限制
-*  bool
-*  int 
-*  float
-*  complex
-*  string
+* bool
+* int 
+* float
+* complex
+* string
+
+<br>
+
+### new 和 make 的区别
+* 二者可以分配内存
+* make用于 slice map channel 的内存分配，返回的是原类型
+* new针对一个类型，分配内存，并初始化该类型的零值，返回的是类型指针
+
+<br>
+
+### goroutine 的优势
+* 上下文切换代价小
+* 内存占用少
+  > 线程栈通常是2M，goroutine栈空间最小是2k，可按需增长。
+  
+<br>
+
+### goroutine什么时候阻塞
+* 发生系统调用等待返回时
+* goroutine进行sleep时
+* channel等待网络请求或者数据操作的IO返回时
+
+<br>
+
+### GPM模型中，goroutine有哪几种状态？
+* _Gidle
+  > 刚刚被分配，但还没有被初始化
+* _Grunnable
+  > 存储在运行队列中，还没有被执行
+* _Grunning
+  > 正在被执行
+* _Gsyscall
+  > 正在执行系统调用
+* _Gwaiting
+  > 发生阻塞时
+* _Gdead
+  > 没有执行代码，可能有分配的栈
+* _Gcopystack
+  > 栈正在被拷贝，没有执行代码，也不在运行队列中
+* _Gpreempted
+  > 由于抢占被阻塞，没有执行代码，也不在运行队列中，等待唤醒
+* _Gscan
+  > GC正在扫描栈空间，没有执行代码，可以与其他状态同时存在
+
+<br>
+
+### select机制的特点
+* select机制用来处理异步IO问题
+* 每个case语句必须是一个IO操作
+* 在语言级别支持select
+
+
+<br>
+
+### interface nil 和 非 interface nil
+```go
+func main() {
+    var p *int = nil
+    var i interface{} = p
+    fmt.Println(i == p) // true
+    fmt.Println(p == nil) // true
+    fmt.Println(i == nil) // false
+}
+```
+* interface{} 类型变量的默认值是 nil
+* interface{} 类型变量一旦赋值就不再是 nil了，不论赋的是什么值
+* interface{} 只有类型、值都为nil，才等于 nil

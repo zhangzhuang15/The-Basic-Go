@@ -31,7 +31,7 @@ func New(maxWorkers, maxTasks int32) *Pool {
 	return &Pool{
 		taskSize:   0,
 		workerSize: 0,
-		seal: false,
+		seal:       false,
 		maxWorkers: maxWorkers,
 		maxTasks:   maxTasks,
 		tasks:      make(chan interface{}, maxTasks),
@@ -82,11 +82,12 @@ func (pool *Pool) Exit() {
 	for atomic.LoadInt32(&pool.taskSize) != 0 {
 		runtime.Gosched()
 	}
-    workerSize := pool.workerSize
+	workerSize := pool.workerSize
 	for i := int32(0); i < workerSize; i++ {
 		pool.workers[i].dead = true
 	}
 	close(pool.tasks)
-    for atomic.LoadInt32(&pool.workerSize) != 0 {}
+	for atomic.LoadInt32(&pool.workerSize) != 0 {
+	}
 	pool.seal = false
 }
