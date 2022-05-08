@@ -3,9 +3,9 @@ package main
 import "fmt"
 
 func main() {
-	var m map[string]int = map[string]int { "Tom": 11}
+	var m map[string]int = map[string]int{"Tom": 11}
 
-	if v, ok:= m["Tom"]; ok {
+	if v, ok := m["Tom"]; ok {
 		fmt.Println("m['Tom'] exists: ", v)
 	}
 
