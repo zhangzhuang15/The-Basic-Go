@@ -30,8 +30,16 @@ func (rwMutex RWMutex) UnLock() {
 func (rwMutex RWMutex) RLock() {
 	var rs int
 
+	// NOTE: select 中没有default时，所有case都阻塞情况下，select就会阻塞，
+	// 直到某个case结束阻塞
 	select {
+	// 如果有写协程，阻塞
 	case rwMutex.write <- struct{}{}:
+	// 如果没有读协程，阻塞
+	// NOTE: 如果写协程存在，第一个读协程就会阻塞在这里，
+	// 当写协程释放锁后，第一个读协程就会从37行代码逃出
+	// 阻塞状态，并在下边送入数据到readers channel，
+	// 后续的读协程就不会再在这里阻塞了
 	case rs = <- rwMutex.readers:
 	}
 
@@ -43,6 +51,9 @@ func (rwMutex RWMutex) RUnLock() {
 	rs := <- rwMutex.readers
 	rs--
 	if rs == 0 {
+		// NOTE: 当读协程数量归0时，要释放写锁，
+		// 同时不能往 readers 中送入数据了，否则
+		// 会出现一个读协程和一个写协程能同时运行的状况
 		<- rwMutex.write
 		return
 	}

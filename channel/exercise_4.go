@@ -10,3 +10,5 @@ func main() {
 
 	close(ch)
 }
+
+// 关闭 nil channel 会panic

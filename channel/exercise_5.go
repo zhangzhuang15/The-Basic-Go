@@ -10,3 +10,5 @@ func main() {
 
 	close(ch)
 }
+
+// close 一个已经关闭的channel 会panic

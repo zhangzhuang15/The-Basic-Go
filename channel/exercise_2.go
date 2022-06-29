@@ -12,3 +12,5 @@ func main() {
 		println("error")
 	}
 }
+
+// 读取 nil channel 会阻塞

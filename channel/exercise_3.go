@@ -7,3 +7,5 @@ func main() {
 	}()
     ch <- 5
 }
+
+// 写入 nil channel 会阻塞

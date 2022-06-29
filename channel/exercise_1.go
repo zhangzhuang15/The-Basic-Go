@@ -6,6 +6,8 @@ func main() {
 
 	go func(){
 		ch <- 3
+		// time.Sleep(500 * time.Millisecond)
+		// close(ch)
 	}()
 
 	for value := range ch {
