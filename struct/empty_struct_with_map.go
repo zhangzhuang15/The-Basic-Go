@@ -7,18 +7,18 @@ import "fmt"
 
 type HashSet map[string]struct{}
 
-func (set *HashSet)Has(s string) bool {
+func (set *HashSet) Has(s string) bool {
 	_, ok := (*set)[s]
 	return ok
 }
 
-func (set *HashSet)Add(s string) {
+func (set *HashSet) Add(s string) {
 	if _, ok := (*set)[s]; !ok {
 		(*set)[s] = struct{}{}
 	}
 }
 
-func (set *HashSet)Delete(s string) {
+func (set *HashSet) Delete(s string) {
 	if _, ok := (*set)[s]; ok {
 		delete(*set, s)
 	}

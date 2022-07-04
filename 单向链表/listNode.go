@@ -28,7 +28,7 @@ func New(array []int) *ListNode {
 	return cur
 }
 
-// 返回 第 k 个节点
+// 返回第 k 个节点
 func (head *ListNode) GetNode(k int) *ListNode {
 	if k <= 0 {
 		return nil
@@ -43,7 +43,8 @@ func (head *ListNode) GetNode(k int) *ListNode {
 	return cur
 }
 
-// 返回倒数 第 k 个节点，
+// 返回倒数第 k 个节点
+//
 // 双指针算法
 func (head *ListNode) GetLastNode(k int) *ListNode {
 	if k <= 0 {
@@ -68,7 +69,8 @@ func (head *ListNode) GetLastNode(k int) *ListNode {
 	return left
 }
 
-// 返回 中间的节点, 中间的节点可能是一个，也可能是两个
+// 返回中间的节点, 中间的节点可能是一个，也可能是两个
+//
 // 快慢指针算法
 func (head *ListNode) GetMiddleNode() []*ListNode {
 	slow, fast := head, head

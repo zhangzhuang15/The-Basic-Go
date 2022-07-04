@@ -1,3 +1,3 @@
-module the_basic_go
+module theBasicGo
 
 go 1.18
