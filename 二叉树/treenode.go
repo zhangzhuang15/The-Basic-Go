@@ -8,6 +8,7 @@ import (
 type Node struct {
 	left *Node
 	right *Node
+	parent *Node
 	value int
 }
 
@@ -327,4 +328,38 @@ func (root *Node)FindAncestorInSliceNodesBetter(array []int) *Node {
 		return node
 	}
 	return nil
+}
+
+// 按中序遍历顺序，寻找某个节点的后一个节点
+func (root *Node) GetSuccessorNode(node *Node) *Node {
+	if node == nil {
+		return nil
+	}
+	
+	var p *Node
+
+	for p = node; p.parent != nil; {
+		p = p.parent
+	}
+
+	// node 根本不在树中
+	if p != root {
+		return nil
+	}
+	
+	if node.right != nil {
+		p = node.right
+		for p.left != nil {
+			p = p.left
+		}
+	} else {
+		p = node.parent
+		_node := node
+		for p != nil && p.left != _node {
+			_node = p
+			p = p.parent
+		}
+	}
+
+	return p
 }

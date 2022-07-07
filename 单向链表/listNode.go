@@ -126,7 +126,7 @@ func (head *ListNode) GetCircleNode() *ListNode {
 
 	// 此时 slow == fast, 假设 slow从head来到这个位置前进了k步，那么 fast从head来到这个位置前进了2k步。
 	// 那么 k 可能是环上节点的数目，或者是该数目的整数倍。
-	// 如果假设环起点前进m步来到这个位置，那么从head来到该位置要前进 k - m 步，
+	// 如果假设环起点前进m步来到这个位置，那么从head来到环起点要前进 k - m 步，
 	// 从该位置沿着环继续前进k步的话，就会回到该位置，但继续前进 k - m 步的话，就会来到环的起点位置，
 	// 基于这个道理，将 slow 调整到 head， 当下一次 slow 和 fast 相遇的时候，就是环的起点位置。
 	slow = head
@@ -144,6 +144,35 @@ func (head *ListNode) GetCircleNode() *ListNode {
 	}
 
 	return nil
+}
+
+// 获取环上的节点总数
+func (head *ListNode) GetCircleNodeNum() int {
+	slow, fast := head, head
+
+	for fast != nil && fast.next != nil && fast.next.next != nil {
+		fast = fast.next.next
+		slow = slow.next
+		if fast == slow {
+			break
+		}
+	}
+
+	if fast != slow {
+		return 0
+	}
+
+	num := 0
+	
+	for slow != nil && slow.next != nil {
+		slow = slow.next
+		num += 1
+		if slow == fast {
+			break
+		}
+	}
+
+	return num
 }
 
 // 获取两个单链表的交叉节点，也就是说，自这个交叉节点开始，后续的节点二者完全相同（节点地址相同）
