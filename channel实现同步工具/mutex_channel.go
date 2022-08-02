@@ -1,10 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // 独占锁实现
 
-type Mutex chan struct {}
+type Mutex chan struct{}
 
 func NewMutex() Mutex {
 	return make(Mutex, 1)
@@ -15,13 +18,23 @@ func (m Mutex) Lock() {
 }
 
 func (m Mutex) UnLock() {
-	<- m
+	<-m
+}
+
+func (m Mutex) TryLock(t time.Duration) bool {
+	timer := time.NewTimer(t)
+	select {
+	case m <- struct{}{}:
+		return true
+	case <-timer.C:
+		return false
+	}
 }
 
 func main() {
 	m := NewMutex()
 
-	go func(){
+	go func() {
 		defer m.UnLock()
 		m.Lock()
 		fmt.Println("child goroutine")
