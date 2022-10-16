@@ -119,3 +119,15 @@ func TestIntersectionNode(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSort(t *testing.T) {
+	head := New([]int{2, 1, 3, 0})
+
+	result := Sort(head, true)
+
+	for ;result != nil && result.next != nil; result = result.next {
+		if result.value > result.next.value {
+			t.Fail()
+		}
+	}
+}

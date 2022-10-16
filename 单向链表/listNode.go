@@ -163,7 +163,7 @@ func (head *ListNode) GetCircleNodeNum() int {
 	}
 
 	num := 0
-	
+
 	for slow != nil && slow.next != nil {
 		slow = slow.next
 		num += 1
@@ -200,4 +200,110 @@ func GetIntersectionNode(node1 *ListNode, node2 *ListNode) *ListNode {
 	// 所以这个循环终将结束
 
 	return i
+}
+
+// 单项链表就地排序，小 -> 大
+// O(nlogn)
+func Sort(start *ListNode, up bool) *ListNode {
+
+	length := 0
+
+	// 获取链表长度
+	for cur := start; cur != nil; length, cur = length+1, cur.next {}
+
+	// 哨兵节点
+	t := ListNode{0, start}
+
+	// prev 是有序链表的末尾节点
+	// cur  是待排序的第一个节点
+	// next 是 cur 排序后要继续的位置
+	prev, cur := &t, start
+	var next *ListNode = nil
+    
+	subLen := 1
+
+	// subLen 迭代，省略归并算法中的分组递归
+	// subLen 一定是 ≤，避免长度为 2 的整数倍时，漏掉一次排序
+	for ; subLen <= length/2; subLen *= 2 {
+		for cur != nil {
+            // 思路是，从 cur 开始数 2*subLen 个节点，分成两个子链表，两个子链表按顺序合并
+
+			// first 第一个链表的头节点
+			// second 第二个链表的头节点
+			first := cur
+			var second *ListNode = nil
+
+			// 确定第二个链表头节点
+
+			for i := 1; i < subLen && cur != nil && cur.next != nil; i += 1 {
+				cur = cur.next
+			}
+			// 确定第二个链表头节点
+			if cur != nil {
+				second = cur.next
+				// 断开第二个链表头节点
+				// 必须要断开，这样在遍历第一个链表时，当节点为 nil ，就可以判断第一个链表结束
+				cur.next = nil
+			} else {
+				second = nil
+			}
+
+			// 确定 next
+			node := second
+			for i := 1; i < subLen && node != nil && node.next != nil; i += 1 {
+				node = node.next
+			}
+			if node != nil {
+				next = node.next
+				node.next = nil
+			} else {
+				next = nil
+			}
+
+			// first 和 second  合并
+			for first != nil && second != nil {
+				// 升序
+				// 注意 prev 的赋值位置要放在后边，否则会有问题
+				if up {
+					smaller := first
+					if first.value > second.value {
+						smaller = second
+						second = second.next
+					} else {
+						first = first.next
+					}
+					prev.next = smaller
+					prev = prev.next
+					
+					// 降序
+				} else {
+					bigger := first
+					if first.value < second.value {
+						bigger = second
+						second = second.next
+					} else {
+						first = first.next
+					}
+					prev.next = bigger
+					prev = prev.next
+				}
+			}
+
+			// 选中非nil节点
+			notNilOne := first
+			if second != nil {
+				notNilOne = second
+			}
+
+			prev.next = notNilOne
+
+			for prev.next != nil {
+				prev = prev.next
+			}
+			cur = next
+		}
+		prev, cur = &t, t.next
+	}
+
+	return t.next
 }
