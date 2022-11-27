@@ -9,6 +9,7 @@ import "fmt"
 // 2. 新的key必须插入到叶节点；
 // 3. 每个节点同时存储 key 和 值data；（b+树中，data只存储到叶节点，内部节点只存储 key）
 //
+// NOTICE: b树 和 b+树 最重要的操作，就 split（节点分裂） 和 merge（节点合并）
 
 // b树的实现参考《算法导论》（第三版）
 
@@ -285,11 +286,13 @@ func (root *Node) delete(key rune, tree *Tree) bool {
 			// 删除 node.keys[0] 即可
 			if node.keys[0] > key {
 				root.keys[position] = node.keys[0]
+				root.data[position] = node.data[0]
 				return node.delete(node.keys[0], tree)
 			}
 			// node == root.children[position],
 			// 做类似的操作即可
 			root.keys[position] = node.keys[node.nKey-1]
+			root.data[position] = node.data[node.nKey-1]
 			return node.delete(node.keys[node.nKey-1], tree)
 
 		}
@@ -345,6 +348,7 @@ func (root *Node) delete(key rune, tree *Tree) bool {
 	if root.isLeaf {
 		return true
 	}
+	// BUG: 找到的是包含 key 的子树，不是root子节点中包含key的那个子树
 	nodeIndex := root.childIndexHasKey(key)
 	if nodeIndex == -1 {
 		return true
@@ -354,6 +358,7 @@ func (root *Node) delete(key rune, tree *Tree) bool {
 	node := root.children[nodeIndex]
 
 	// node的 key 数量比 minDegree 少，需要调整，以防删除key后，发生key个数下溢
+	// TODO: 和 split 一样，将merge封装起来更好
 	if isTooShort(node, tree.minDegree) {
 		// node 的相邻节点，该节点的 key 必须多于 minDegree - 1 个
 		var leftNeighbor *Node
