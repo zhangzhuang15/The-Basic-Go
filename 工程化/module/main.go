@@ -4,7 +4,7 @@ import (
 	"fmt"
 	u "jack/utils"
 
-	p "github.com/peter"
+	pete "github.com/peter"
 )
 
 func main() {
@@ -13,5 +13,5 @@ func main() {
 
 	fmt.Printf("result: %d\n", u.Add(a, b))
 
-	p.Hello()
+	pete.Hello()
 }
